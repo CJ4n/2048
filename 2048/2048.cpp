@@ -33,7 +33,7 @@ struct area {
 	HWND h = NULL;
 	int val = -1;
 	RECT rc = { 0,0,0,0 };
-	int x=-1, y=-1;
+	int x = -1, y = -1;
 };
 area* w1[4][4];
 area* w2[4][4];
@@ -253,7 +253,8 @@ BOOL CALLBACK  Repaint(HWND hWnd, LPARAM lParam, HDC hdc, PAINTSTRUCT ps) {
 	else if (a->val == 256) color = RGB(239, 204, 98);
 	else if (a->val == 512) color = RGB(243, 201, 85);
 	else if (a->val == 1024) color = RGB(238, 200, 72);
-	else  color = (239, 192, 47);
+	else if (a->val == 2048)color = RGB(239, 192, 47);
+	else color = RGB(0, 0, 0);
 	HPEN pen = CreatePen(PS_SOLID, 1, color);
 	HBRUSH brush = CreateSolidBrush(color);
 	HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, brush);
@@ -264,12 +265,14 @@ BOOL CALLBACK  Repaint(HWND hWnd, LPARAM lParam, HDC hdc, PAINTSTRUCT ps) {
 		return TRUE;
 
 	int c = a->val;
-	TCHAR s[4];
-	const wchar_t len = 4;
+	TCHAR s[10];
+	const wchar_t len = 10;
 	swprintf(s, len, L"%d", c);
 	GetClientRect(hWnd, &rc);
 	SetBkMode(hdc, TRANSPARENT);
 	SetTextColor(hdc, RGB(255, 255, 255));
+	int fontSize = 30;
+	if (a->val > 1000) fontSize = 24;
 	HFONT font = CreateFont(30, 0, 0, 0, FW_BOLD, false, FALSE, 0, EASTEUROPE_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_SWISS, _T(" Verdana "));
 	HFONT oldFont = (HFONT)SelectObject(hdc, font);
 	DrawText(hdc, s, (int)_tcslen(s), &rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
