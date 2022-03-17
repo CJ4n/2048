@@ -1,4 +1,4 @@
 ﻿  2048.cpp
-C:\JAN CICHOMSKI\STUDIA\STUDIA_SEMESTR_4_2022_LATO\programowanie w środowisku graficznym\winAPI\lab\2048\2048\2048.cpp(70,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-C:\JAN CICHOMSKI\STUDIA\STUDIA_SEMESTR_4_2022_LATO\programowanie w środowisku graficznym\winAPI\lab\2048\2048\2048.cpp(324,42): warning C4838: conversion from 'unsigned int' to 'BYTE' requires a narrowing conversion
+C:\JAN CICHOMSKI\STUDIA\STUDIA_SEMESTR_4_2022_LATO\programowanie w środowisku graficznym\winAPI\lab\2048\2048\2048.cpp(78,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\JAN CICHOMSKI\STUDIA\STUDIA_SEMESTR_4_2022_LATO\programowanie w środowisku graficznym\winAPI\lab\2048\2048\2048.cpp(332,42): warning C4838: conversion from 'unsigned int' to 'BYTE' requires a narrowing conversion
   2048.vcxproj -> C:\JAN CICHOMSKI\STUDIA\STUDIA_SEMESTR_4_2022_LATO\programowanie w środowisku graficznym\winAPI\lab\2048\x64\Debug\2048.exe

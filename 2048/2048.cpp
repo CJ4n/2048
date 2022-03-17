@@ -1,4 +1,12 @@
-﻿#define _CRT_SECURE_NO_WARNINGS
+﻿// @Jan Cichomski: Game 2048 
+//
+// parent - main game window
+// second - window which mimics main window
+// scoreWin1/scoreWin1 - scorebar windows
+// w1 - array of squre windows for parent
+// w2 - array of squre windows for second
+
+#define _CRT_SECURE_NO_WARNINGS
 #include "framework.h"
 #include "2048.h"
 #include "Resource.h"
@@ -8,7 +16,7 @@
 #include <Windows.h>
 #include <wingdi.h>
 #include <errno.h>
-using namespace std;
+//using namespace std;
 #define MAX_LOADSTRING 100
 
 // Global Variables:
@@ -25,14 +33,14 @@ struct area {
 	HWND h = NULL;
 	int val = -1;
 	RECT rc = { 0,0,0,0 };
-	int x, y;
+	int x=-1, y=-1;
 };
 area* w1[4][4];
 area* w2[4][4];
-int score = 0;
-int gameGoal = 2048;
-int biggestSquare = 2;
-int state = -1;
+int score = 0; // Players score
+int gameGoal = 2048; // Required squre to win game
+int biggestSquare = 2; // Keeps track of bigges square in game
+int state = -1; // -1 - game goes on / 0 - player lost / 1- player won
 
 // Functions declarations
 ATOM MyRegisterClass(HINSTANCE hInstance);
@@ -90,7 +98,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	}
 	return (int)msg.wParam;
 }
-
+// Register main window class
 ATOM MyRegisterClass(HINSTANCE hInstance)
 {
 	WNDCLASSEXW wcex;
@@ -108,7 +116,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_ICON3));
 	return RegisterClassExW(&wcex);
 }
-
+// Register square class window
 ATOM RegisterChild(HINSTANCE hInstance)
 {
 	WNDCLASSEXW wcex;
@@ -126,7 +134,7 @@ ATOM RegisterChild(HINSTANCE hInstance)
 	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 	return RegisterClassExW(&wcex);
 }
-
+// Register second main window class
 ATOM RegisterSecond(HINSTANCE hInstance)
 {
 	WNDCLASSEXW wcex;
@@ -144,7 +152,7 @@ ATOM RegisterSecond(HINSTANCE hInstance)
 	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_ICON3));
 	return RegisterClassExW(&wcex);
 }
-
+// Register scorebar window class
 ATOM RegisterPointsWindow(HINSTANCE hInstance)
 {
 	WNDCLASSEXW wcex;
@@ -162,7 +170,7 @@ ATOM RegisterPointsWindow(HINSTANCE hInstance)
 	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_ICON3));
 	return RegisterClassExW(&wcex);
 }
-
+// Initiate second main window
 BOOL InitSecond(HINSTANCE hInstance, HWND hWnd)
 {
 	int y = GetSystemMetrics(SM_CYSCREEN);
@@ -185,7 +193,7 @@ BOOL InitSecond(HINSTANCE hInstance, HWND hWnd)
 	UpdateWindow(second);
 	return TRUE;
 }
-
+// initiate entire game
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
 	hInst = hInstance;
@@ -211,7 +219,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	TickMenuBox(gameGoal);
 	return TRUE;
 }
-
+// Animation of merging two squres with equal value
 void AnimateMergeWin(HWND hWnd)
 {
 	static int s = 80;
@@ -227,7 +235,7 @@ void AnimateMergeWin(HWND hWnd)
 	}
 	s -= 2;
 }
-
+// Repains given window square with new color and text based on square value
 BOOL CALLBACK  Repaint(HWND hWnd, LPARAM lParam, HDC hdc, PAINTSTRUCT ps) {
 	area* a = (area*)GetWindowLongPtrA(hWnd, GWLP_USERDATA);
 	RECT rc;
@@ -273,12 +281,12 @@ BOOL CALLBACK  Repaint(HWND hWnd, LPARAM lParam, HDC hdc, PAINTSTRUCT ps) {
 	DeleteObject(brush);
 	return TRUE;
 }
-
+// Repains scorebar windows
 void UpdatePointsWin() {
 	InvalidateRect(scoreWin2, NULL, NULL);
 	InvalidateRect(scoreWin1, NULL, NULL);
 }
-
+// How to repaint scorebar window
 void PaintScoreWin(HWND hWnd, HDC hdc, PAINTSTRUCT ps) {
 	RECT rc;
 	GetClientRect(hWnd, &rc);
@@ -303,7 +311,7 @@ void PaintScoreWin(HWND hWnd, HDC hdc, PAINTSTRUCT ps) {
 	DeleteObject(brush);
 	DeleteObject(font);
 }
-
+// Checks if player can perform any move, if not than game ends, otherwise game continues
 BOOL IsThereLegalMove() {
 	for (int i = 0; i < 4; i++)
 		for (int j = 0; j < 4; j++) {
@@ -365,7 +373,7 @@ bool CoverWinWithBitMap(HDC hdc, RECT dim, COLORREF penCol, unsigned int opacity
 	SelectObject(tempHdc, old);
 	return ret;
 }
-
+// Displays endgame semitransparent bitmap on window (function called when game ended for any reason)
 void EndGameProcedure() {
 	InvalidateRect(scoreWin1, NULL, NULL);
 	InvalidateRect(parent, NULL, NULL);
@@ -380,7 +388,7 @@ void EndGameProcedure() {
 			InvalidateRect(w2[i][j]->h, NULL, NULL);
 	int a = 1;
 }
-
+// Game controles implementation (moving and merging all valid windows)
 void MoveWindows(HWND hWnd, TCHAR c) {
 
 	BOOL sthMoved = FALSE;
@@ -540,7 +548,7 @@ void MoveWindows(HWND hWnd, TCHAR c) {
 	}
 	else state = -1;
 }
-
+// Update values on second main window (since I perform all operation on main window and only copies output of these operation to second main windwo)
 void UpdateMiniWindows() {
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
@@ -552,7 +560,7 @@ void UpdateMiniWindows() {
 	}
 	InvalidateRect(scoreWin2, NULL, NULL);
 }
-
+// Animation of new poping up, squares
 void AnimateRandWin(HWND hWnd) {
 	static int size = 20;
 
@@ -568,7 +576,7 @@ void AnimateRandWin(HWND hWnd) {
 	}
 	size += 5;
 }
-
+// Fill one of free squares with new square with value 2
 void FillRandomSquare(bool animate) {
 	int y = rand() % 4;
 	int x = rand() % 4;
@@ -591,7 +599,7 @@ void FillRandomSquare(bool animate) {
 	if (animate)
 		SetTimer(w1[x][y]->h, 1, 30, NULL);
 }
-
+// Starts new game, sets default values for all game parameters, expect gameGoal
 void NewGame() {
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
@@ -618,7 +626,7 @@ void NewGame() {
 			InvalidateRect(w2[i][j]->h, NULL, NULL);
 		}
 }
-
+// Save game state when player quits game
 void SaveGameState() {
 	const int bufSize = 256;
 	WCHAR buf[bufSize];
@@ -656,7 +664,7 @@ void SaveGameState() {
 
 	WritePrivateProfileStringW(L"2048", L"STATE", buf, L".//.file.ini");
 }
-
+// If game state can't bo loade form init file properlly, it solves all problems
 void LoadGameFailedProcedure() {
 	score = 0;
 	gameGoal = 2048;
@@ -669,7 +677,7 @@ void LoadGameFailedProcedure() {
 		}
 	FillRandomSquare();
 }
-
+// Loads game state form file
 void LoadGameState() {
 	const int bufSize = 256;
 	WCHAR buf[bufSize];
@@ -736,7 +744,7 @@ void LoadGameState() {
 	InvalidateRect(scoreWin1, NULL, NULL);
 	InvalidateRect(scoreWin2, NULL, NULL);
 }
-
+// Showing which menu item is ticked
 void TickMenuBox(int newGameGoal) {
 	HMENU menu1 = GetMenu(parent);
 	HMENU menu2 = GetMenu(second);
@@ -783,14 +791,14 @@ void TickMenuBox(int newGameGoal) {
 	}
 	gameGoal = newGameGoal;
 }
-
+// Pains game end screen( WIN OR LOSE + proper backgroud)
 void PaintEndGameScreeen(HWND hWnd, HDC hdc, PAINTSTRUCT ps) {
 	RECT a;
 	GetClientRect(hWnd, &a);
 	if (!CoverWinWithBitMap(hdc, a, RGB(255, 255, 0), 130, hWnd))
 		MessageBox(NULL, L"fun albpa false", NULL, NULL);
 }
-
+// Proces messeges for main window
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
@@ -925,7 +933,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	return 0;
 }
-
+// Proces messeges for second main window
 LRESULT CALLBACK WndProcSecond(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
@@ -1049,7 +1057,7 @@ LRESULT CALLBACK WndProcSecond(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 	}
 	return 0;
 }
-
+// Proces messeges for square windows
 LRESULT CALLBACK WndProcChild(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
@@ -1092,7 +1100,7 @@ LRESULT CALLBACK WndProcChild(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 	}
 	return 0;
 }
-
+// Proces messeges for score windows
 LRESULT CALLBACK WndProcScore(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	switch (message)
 	{
