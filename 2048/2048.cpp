@@ -371,6 +371,10 @@ bool CoverWinWithBitMap(HDC hdc, RECT dim, COLORREF penCol, unsigned int opacity
 	bool ret = bool(AlphaBlend(hdc, dim.left, dim.top, dim.right, dim.bottom, tempHdc, dim.left, dim.top, dim.right, dim.bottom, blend));
 	SelectObject(hdc, oldFont);
 	SelectObject(tempHdc, old);
+
+	DeleteObject(font);
+	DeleteObject(old);
+	DeleteObject(hbitmap);
 	return ret;
 }
 // Displays endgame semitransparent bitmap on window (function called when game ended for any reason)
